@@ -49,7 +49,7 @@ npx playwright show-report                # abre o relatório HTML
 - **`test.step()`:** usado no fluxo de compra completa para deixar o relatório legível.
 - **Somente Chromium:** suficiente para o escopo do desafio.
 - **BDD (Cucumber) descartado:** adicionaria complexidade sem ganho para o escopo.
-- **Relatório HTML:** gerado em `playwright-report/`, com trace e screenshot em caso de falha.
+- **Relatório HTML:** gerado em `playwright-report/`, com screenshot em caso de falha e trace na primeira repetição de um teste que falhou.
 
 ## Cenários cobertos
 
