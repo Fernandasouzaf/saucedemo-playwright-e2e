@@ -77,6 +77,6 @@ npx playwright show-report                # abre o relatório HTML
 ## Cenários pendentes e como seriam abordados
 
 - **Outros usuários de teste** (`problem_user`, `performance_glitch_user`, `error_user`, `visual_user`): um projeto ou fixture por tipo de usuário. Esses usuários têm falhas propositais, então os testes confirmariam os defeitos conhecidos.
-- **Firefox e WebKit:** adicionar projetos em `playwright.config.ts`, rodando só um subconjunto (smoke) para manter a suíte rápida.
+- - **Firefox e WebKit (cross-browser):** a suíte roda só em Chromium. Para ampliar, adicionaria projetos em `playwright.config.ts` e rodaria nesses navegadores apenas um subconjunto marcado como `@smoke`, mantendo a suíte rápida e estável. O WebKit teria prioridade sobre o Firefox, por representar o Safari.
 - **CI:** workflow do GitHub Actions rodando os testes a cada push e publicando o relatório.
 - **Acessibilidade** (`@axe-core/playwright`) e **testes visuais** (comparação de screenshots).
