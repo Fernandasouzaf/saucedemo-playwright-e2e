@@ -42,8 +42,10 @@ npx playwright show-report                # abre o relatório HTML
 - **Fixtures:** entregam os Page Objects e a fixture `loggedInPage`, que faz o login antes do teste e evita repetição.
 - **Test id `data-test`:** configurado em `testIdAttribute`, pois o Sauce Demo usa esse atributo. Os seletores por test id são estáveis.
 - **Asserções web-first:** uso de `await expect(...)` com auto-retry e `expect.poll` na ordenação. Não há esperas fixas (`waitForTimeout`).
+- **Estabilidade na navegação:** após mudar de tela, os testes esperam um elemento exclusivo da tela de destino, e não apenas a URL, porque a URL muda antes de o conteúdo ser renderizado.
 - **Testes independentes:** cada teste prepara o próprio estado, podendo rodar em paralelo e em qualquer ordem.
 - **Dados desacoplados:** usuários, produtos e dados de checkout ficam em `data/`.
+- **Testes parametrizados:** ordenação e validação de campos obrigatórios usam laços sobre uma lista de casos, evitando código repetido.
 - **`test.step()`:** usado no fluxo de compra completa para deixar o relatório legível.
 - **Somente Chromium:** suficiente para o escopo do desafio.
 - **BDD (Cucumber) descartado:** adicionaria complexidade sem ganho para o escopo.
@@ -56,21 +58,25 @@ npx playwright show-report                # abre o relatório HTML
 | Login | Login com credenciais válidas |
 | Login | Senha incorreta exibe erro |
 | Login | Usuário bloqueado (`locked_out_user`) |
+| Login | Campos vazios (usuário obrigatório) e senha vazia (senha obrigatória) |
+| Login | Logout encerra a sessão |
+| Login | Acesso direto a `/inventory.html` sem login é bloqueado |
 | Produtos | Listagem com 6 produtos completos |
 | Produtos | Ordenação por nome (A-Z e Z-A) e por preço (menor-maior e maior-menor) |
 | Produtos | Página de detalhes com dados iguais aos da listagem |
 | Carrinho | Adicionar um produto (badge e botão) |
 | Carrinho | Conteúdo do carrinho (nome, preço e quantidade) |
 | Carrinho | Adicionar vários produtos |
+| Carrinho | Remover um produto mantendo os demais |
+| Carrinho | Continuar comprando preserva o item no carrinho |
 | Checkout | Compra completa de ponta a ponta |
 | Checkout | Revisão do pedido (subtotal + imposto = total) |
+| Checkout | Cancelar o checkout volta ao carrinho preservando o item |
+| Checkout | Validação de nome, sobrenome e CEP obrigatórios |
 
 ## Cenários pendentes e como seriam abordados
 
-- **Validações de campos vazios no login e no checkout:** testes parametrizados com a mensagem de erro esperada.
-- **Remover item do carrinho, continuar comprando e cancelar checkout.**
-- **Logout** e **acesso direto a `/inventory.html` sem login** (verificar redirecionamento).
-- **Outros usuários de teste** (`problem_user`, `performance_glitch_user`, `error_user`, `visual_user`): um projeto ou fixture por tipo de usuário.
-- **Firefox e WebKit:** adicionar projetos em `playwright.config.ts`.
+- **Outros usuários de teste** (`problem_user`, `performance_glitch_user`, `error_user`, `visual_user`): um projeto ou fixture por tipo de usuário. Esses usuários têm falhas propositais, então os testes confirmariam os defeitos conhecidos.
+- **Firefox e WebKit:** adicionar projetos em `playwright.config.ts`, rodando só um subconjunto (smoke) para manter a suíte rápida.
 - **CI:** workflow do GitHub Actions rodando os testes a cada push e publicando o relatório.
 - **Acessibilidade** (`@axe-core/playwright`) e **testes visuais** (comparação de screenshots).

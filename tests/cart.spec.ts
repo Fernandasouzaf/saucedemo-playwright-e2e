@@ -52,4 +52,39 @@ test.describe('Carrinho', () => {
       selected.map((p) => formatPrice(p.price))
     );
   });
+
+  test('remove um produto do carrinho e mantém os demais', async ({
+    loggedInPage,
+    cartPage,
+  }) => {
+    const removed = products.backpack;
+    const kept = products.bikeLight;
+
+    await loggedInPage.addToCart(removed.slug);
+    await loggedInPage.addToCart(kept.slug);
+    await loggedInPage.goToCart();
+    await expect(cartPage.items).toHaveCount(2);
+
+    await cartPage.removeButton(removed.slug).click();
+
+    await expect(cartPage.items).toHaveCount(1);
+    await expect(cartPage.itemNames).toHaveText(kept.name);
+    await expect(loggedInPage.cartBadge).toHaveText('1');
+  });
+
+  test('continua comprando e preserva o item no carrinho', async ({
+    loggedInPage,
+    cartPage,
+    page,
+  }) => {
+    const { slug } = products.backpack;
+
+    await loggedInPage.addToCart(slug);
+    await loggedInPage.goToCart();
+    await cartPage.continueShopping();
+
+    await expect(page).toHaveURL(/inventory\.html/);
+    await expect(loggedInPage.removeButton(slug)).toBeVisible();
+    await expect(loggedInPage.cartBadge).toHaveText('1');
+  });
 });

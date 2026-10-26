@@ -64,4 +64,57 @@ test.describe('Finalização da compra', () => {
     expect(subtotal).toBeCloseTo(expectedSubtotal, 2);
     expect(total).toBeCloseTo(subtotal + tax, 2);
   });
+
+  test('cancela o checkout e volta ao carrinho preservando o item', async ({
+    loggedInPage,
+    cartPage,
+    checkoutPage,
+    page,
+  }) => {
+    const product = products.backpack;
+
+    await loggedInPage.addToCart(product.slug);
+    await loggedInPage.goToCart();
+    await cartPage.checkout();
+    await checkoutPage.cancelButton.click();
+
+    await expect(page).toHaveURL(/cart\.html/);
+    await expect(cartPage.itemNames).toHaveText(product.name);
+  });
+});
+
+test.describe('Validação do formulário de checkout', () => {
+  test.beforeEach(async ({ loggedInPage, cartPage }) => {
+    await loggedInPage.addToCart(products.backpack.slug);
+    await loggedInPage.goToCart();
+    await cartPage.checkout();
+  });
+
+  const missingFieldCases = [
+    {
+      label: 'o nome',
+      info: { ...checkoutInfo, firstName: '' },
+      error: 'First Name is required',
+    },
+    {
+      label: 'o sobrenome',
+      info: { ...checkoutInfo, lastName: '' },
+      error: 'Last Name is required',
+    },
+    {
+      label: 'o CEP',
+      info: { ...checkoutInfo, postalCode: '' },
+      error: 'Postal Code is required',
+    },
+  ];
+
+  for (const { label, info, error } of missingFieldCases) {
+    test(`exige ${label} para continuar`, async ({ checkoutPage, page }) => {
+      await checkoutPage.fillInformation(info);
+      await checkoutPage.continue();
+
+      await expect(checkoutPage.errorMessage).toContainText(error);
+      await expect(page).toHaveURL(/checkout-step-one\.html/);
+    });
+  }
 });

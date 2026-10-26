@@ -10,6 +10,8 @@ export class InventoryPage {
   readonly sortDropdown: Locator;
   readonly cartLink: Locator;
   readonly cartBadge: Locator;
+  readonly menuButton: Locator;
+  readonly logoutLink: Locator;
 
   constructor(private readonly page: Page) {
     this.title = page.getByTestId('title');
@@ -19,6 +21,8 @@ export class InventoryPage {
     this.sortDropdown = page.getByTestId('product-sort-container');
     this.cartLink = page.getByTestId('shopping-cart-link');
     this.cartBadge = page.getByTestId('shopping-cart-badge');
+    this.menuButton = page.getByRole('button', { name: 'Open Menu' });
+    this.logoutLink = page.getByTestId('logout-sidebar-link');
   }
 
   async sortBy(option: SortOption) {
@@ -54,5 +58,10 @@ export class InventoryPage {
 
   async goToCart() {
     await this.cartLink.click();
+  }
+
+  async logout() {
+    await this.menuButton.click();
+    await this.logoutLink.click();
   }
 }

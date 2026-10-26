@@ -62,6 +62,7 @@ test.describe('Listagem e navegação de produtos', () => {
     await loggedInPage.openProduct(product.name);
 
     await expect(page).toHaveURL(/inventory-item\.html/);
+    await expect(productDetailPage.backButton).toBeVisible();
     await expect(productDetailPage.name).toHaveText(product.name);
     await expect(productDetailPage.description).toHaveText(listedDescription);
     await expect(productDetailPage.price).toHaveText(
